@@ -18,10 +18,27 @@ def calculate_round_scores(round):
     return dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
 
 
+def mvp(round_scores):
+    """Retorna el nombre del mvp de una ronda."""
+    return max(round_scores, key=round_scores.get)
+
+
+def print_round_scores(round, round_scores, round_number):
+    """Imprime los resultados de una ronda ordenados por el puntaje de los jugadores de mayor a menor."""
+    print(f"Ranking ronda {round_number}:\nJugador    Kills    Asistencias  Muertes  Puntos")
+    print("-" * 56)
+    for player in round_scores.keys():
+        print(f"{player:8} {round[player]['kills']:3} {round[player]['assists']:8} {round[player]['deaths']:12} {round_scores[player]:8}")
+    print(f"{'-' * 56}\n¡{mvp(round_scores)} es el MVP de la ronda {round_number}!\n")
+
+
 def simulate_rounds(rounds, total_stats):
     """Simula todas las rondas del juego y actualiza las estadísticas totales de los jugadores."""
-    for round in rounds:
+    # Uso enumerate para asignarle a cada ronda su respectivo número
+    for i, round in enumerate(rounds):
         round_scores = calculate_round_scores(round)
+        print_round_scores(round, round_scores, i+1)
+
 
 
 def final_ranking(stats):
