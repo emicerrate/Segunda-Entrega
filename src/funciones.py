@@ -14,44 +14,47 @@ def calculate_round_scores(round):
     scores = {player: calculate_score(stats["kills"], stats["assists"], stats["deaths"]) for player, stats in round.items()}
     
     # Uso sorted para ordenar el diccionario por los puntos de mayor a menor
-    # Como sorted retorna una lista la convierto a un diccionario explicítamente
-    return dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
+    # Como sorted retorna una lista la convierto a un diccionario 
+    scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    mvp = scores[0][0]
+    return dict(scores), mvp
 
 
-def mvp(round_scores):
-    """Retorna el nombre del mvp de una ronda."""
-    return max(round_scores, key=round_scores.get)
-
-
-def print_round_scores(round, round_scores, round_number):
+def print_round_scores(round, round_scores, round_number, mvp=None):
     """Imprime los resultados de una ronda ordenados por el puntaje de los jugadores de mayor a menor."""
     print(f"Ranking ronda {round_number}:\nJugador    Kills    Asistencias  Muertes  Puntos")
     print("-" * 56)
     for player in round_scores.keys():
         print(f"{player:8} {round[player]['kills']:3} {round[player]['assists']:8} {round[player]['deaths']:12} {round_scores[player]:8}")
-    print(f"{'-' * 56}\n¡{mvp(round_scores)} es el MVP de la ronda {round_number}!\n")
+    print(f"{'-' * 56}\n¡{mvp} es el MVP de la ronda {round_number}!\n")
 
 
-def update_stats(round, round_scores, total_stats):
+def update_stats(round, round_scores, total_stats, mvp):
     """Actualiza las estadísticas para cada jugador depués de una ronda."""
     for player, stats in round.items():
         # Con la variable stat actualizo las estadísticas que ya vienen en la ronda para ahorrar líneas de código
         for stat in stats.keys():
             total_stats[player][stat] += round[player][stat]
         total_stats[player]["points"] += round_scores[player]
-    total_stats[mvp(round_scores)]["MVPs"] += 1
+    total_stats[mvp]["MVPs"] += 1
 
 
 def simulate_rounds(rounds, total_stats):
     """Simula todas las rondas del juego y actualiza las estadísticas totales de los jugadores."""
     # Uso enumerate para asignarle a cada ronda su respectivo número
     for i, round in enumerate(rounds):
-        round_scores = calculate_round_scores(round)
-        print_round_scores(round, round_scores, i+1)
-        update_stats(round, round_scores, total_stats)
+        round_scores, mvp = calculate_round_scores(round)
+        print_round_scores(round, round_scores, i+1, mvp)
+        update_stats(round, round_scores, total_stats, mvp)
 
 
 
 def final_ranking(stats):
     """Imprime el ranking final del juego."""
-    return None
+    # Ordenamos las estadísticas por puntos de mayor a menor
+    stats = dict(sorted(stats.items(), key=lambda x: x[1]["points"], reverse=True))
+    print(f"Ranking final:\nJugador    Kills    Asistencias  Muertes  MVPs  Puntos")
+    print("-" * 56)
+    for player in stats.keys():
+        print(f"{player:8} {stats[player]['kills']:3} {stats[player]['assists']:8} {stats[player]['deaths']:12} {stats[player]['MVPs']:8} {stats[player]['points']:6}")
+    print("-" * 56)
