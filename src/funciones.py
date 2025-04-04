@@ -32,12 +32,23 @@ def print_round_scores(round, round_scores, round_number):
     print(f"{'-' * 56}\n¡{mvp(round_scores)} es el MVP de la ronda {round_number}!\n")
 
 
+def update_stats(round, round_scores, total_stats):
+    """Actualiza las estadísticas para cada jugador depués de una ronda."""
+    for player, stats in round.items():
+        # Con la variable stat actualizo las estadísticas que ya vienen en la ronda para ahorrar líneas de código
+        for stat in stats.keys():
+            total_stats[player][stat] += round[player][stat]
+        total_stats[player]["points"] += round_scores[player]
+    total_stats[mvp(round_scores)]["MVPs"] += 1
+
+
 def simulate_rounds(rounds, total_stats):
     """Simula todas las rondas del juego y actualiza las estadísticas totales de los jugadores."""
     # Uso enumerate para asignarle a cada ronda su respectivo número
     for i, round in enumerate(rounds):
         round_scores = calculate_round_scores(round)
         print_round_scores(round, round_scores, i+1)
+        update_stats(round, round_scores, total_stats)
 
 
 
